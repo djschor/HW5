@@ -132,9 +132,9 @@ def all_lists():
     all_lists = []
     lsts = TodoList.query.all()
     #for a in lsts: 
-     #   liste = TodoList.query.filter_by(id = a.list_id).first()
-      #  all_lists.append((a.title, a.items))
-    return render_template('all_lists.html',todo_lists=lsts, form=form, form_del = form_del)
+    #    items = TodoItem.query.filter_by(id = a.list_id).first()
+    #    all_lists.append((a.title, a.items))
+    return render_template('all_lists.html',todo_lists=lsts, form=form, formdel = form_del)
 
 # TODO 364: Update the all_lists.html template and the all_lists view function such that there is a delete button available for each ToDoList saved.
 # When you click on the delete button for each list, that list should get deleted -- this is also addressed in a later TODO.
@@ -153,7 +153,16 @@ def one_list(ident):
 # TODO 364: Complete route to update an individual ToDo item's priority
 @app.route('/update/<item>',methods=["GET","POST"])
 def update(item):
-    pass # Replace with code
+    form = UpdatePriority()
+    if form.validate_on_submit():
+        new_priority = form.newPriority.data
+        i = TodoItem.query.filter_by(id = item).first()
+        i.priority = new_priority
+        db.session.commit()
+        flash("Updated priority of " + item)
+        return redirect(url_for('index'))
+    return render_template('update_item.html',item = item, form = form)
+
     # This code should use the form you created above for updating the specific item and manage the process of updating the item's priority.
     # Once it is updated, it should redirect to the page showing all the links to todo lists.
     # It should flash a message: Updated priority of <the description of that item>
@@ -164,7 +173,11 @@ def update(item):
 # TODO 364: Complete route to delete a whole ToDoList
 @app.route('/delete/<lst>',methods=["GET","POST"])
 def delete(lst):
-    pass # Replace with code
+    l = TodoList.query.filter_by(title = lst).first()
+    db.session.delete(l)
+    db.session.commit()
+    flash("Successfully deleted {}".format(lst))
+    return redirect(url_for('all_lists'))
     # This code should successfully delete the appropriate todolist
     # Should flash a message about what was deleted, e.g. Deleted list <title of list>
     # And should redirect the user to the page showing all the todo lists
