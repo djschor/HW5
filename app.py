@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = 'hard to guess string from si364'
 ## TODO 364: Create a database in postgresql in the code line below, and fill in your app's database URI. It should be of the format: postgresql://localhost/YOUR_DATABASE_NAME
 
 ## Your final Postgres database should be your uniqname, plus HW5, e.g. "jczettaHW5" or "maupandeHW5"
-app.config["SQLALCHEMY_DATABASE_URI"] = ""
+app.config["SQLALCHEMY_DATABASE_URI"] =  "postgres://postgres:snubbalo@localhost/djschorHW5"
 ## Provided:
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -64,14 +64,19 @@ class TodoListForm(FlaskForm):
     submit = SubmitField("Submit")
 
 # TODO 364: Define an UpdateButtonForm class for use to update todo items
-
-
+class UpdateButtonForm(FlaskForm):
+    submit = SubmitField('Update')
 
 # TODO 364: Define a form class for updating the priority of a todolist item
 #(HINT: What class activity you have done before is this similar to?)
+class UpdatePriority(FlaskForm): 
+    newPriority = StringField("What is the new priority of item?", validators=[Required()])
+    submit = SubmitField('Update')
 
 
 # TODO 364: Define a DeleteButtonForm class for use to delete todo items
+class DeleteButtonForm(FlaskForm):
+    submit = SubmitField('Delete')
 
 
 
@@ -122,9 +127,14 @@ def index():
 # Provided - see below for additional TODO
 @app.route('/all_lists',methods=["GET","POST"])
 def all_lists():
-    form = DeleteButtonForm()
+    form_del = DeleteButtonForm()
+    form = UpdateButtonForm()
+    all_lists = []
     lsts = TodoList.query.all()
-    return render_template('all_lists.html',todo_lists=lsts, form=form)
+    #for a in lsts: 
+     #   liste = TodoList.query.filter_by(id = a.list_id).first()
+      #  all_lists.append((a.title, a.items))
+    return render_template('all_lists.html',todo_lists=lsts, form=form, form_del = form_del)
 
 # TODO 364: Update the all_lists.html template and the all_lists view function such that there is a delete button available for each ToDoList saved.
 # When you click on the delete button for each list, that list should get deleted -- this is also addressed in a later TODO.
